@@ -72,7 +72,7 @@ class Brain(threading.Thread):
 
     def start(self, *args, **kwargs):
         self._running = True
-        super(Brain, self).run(*args, **kwargs)
+        super(Brain, self).start(*args, **kwargs)
 
 
     def stop(self):
@@ -100,7 +100,7 @@ class Brain(threading.Thread):
         lastByte = 0
         startTime = None
 
-        while self._running and self.serialPort.closed is not True:
+        while self._running and not self.serialPort.closed:
             latestByte = ord(self.serialPort.read())
             self.bytesRead += 1
 
@@ -242,14 +242,16 @@ if __name__ == "__main__":
     import serial.tools.list_ports
 
     if len(sys.argv) > 1:
-        port = sys.arv[-1]
+        port = sys.argv[-1]
     else:
         print "To test Brain, provide a serial port name, e.g. one of:"
         for p in serial.tools.list_ports.comports():
             print "\t%s" % p[0]
         exit(0)
 
-    serialport = serial.Serial(port=portName, baudrate=9600)
+    serialport = serial.Serial(port=port, baudrate=9600)
 
     b = Brain(serialport)
     b.start()
+    while True:
+        pass
